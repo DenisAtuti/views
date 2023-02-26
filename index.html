@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+    <title>Videos views checker</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            font-family: 'Lora', serif;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            height:100vh;
+        }
+        .card{
+            background-color: rgb(231, 231, 231);
+            padding:40px;
+            border-radius:10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        h2 {
+            background-color: #FDA11B;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            color:#060000
+        }
+        p{
+            margin-bottom: 10px;
+            font-size:20px;
+        }
+        p:nth-child(3),  
+        p:nth-child(5),
+        p:nth-child(7){
+            color:green;
+            padding: 5px 10px;
+            width: 100%;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background-color:rgba(2, 70, 2, 0.2);
+            border-radius: 5px;
+        }
+       
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Views regular check</h2>
+        <p>last check date</p>
+        <p id="last-check"></p>
+        <p>views since</p>
+        <p id="tag">0</p>
+        <p>Clicks</p>
+        <p id="click">0</p>
+    </div>
+
+
+    <script>
+        const header = document.getElementById("tag")
+        const clickTag = document.getElementById("click")
+        const date = document.getElementById("last-check").innerText = localStorage.getItem("lastDate");
+
+        async function fetchAds() {
+            const response = await fetch('https://socialize-backend.herokuapp.com/api/v1/ad/get/all');
+            const ads = await response.json();
+            return ads;
+        }
+
+
+        fetchAds().then((data) => {
+            processData(data)
+        })
+
+        let sum = 0
+        let totalClicks = 0
+        let lastCheck = localStorage.getItem("sum");
+        let lastClicks = localStorage.getItem("clicks");
+
+        let views = 0
+        let clicks = 0
+
+
+        function processData(data) {
+            data.forEach(item => {
+                sum = item.impressions + sum
+                totalClicks = item.clicks + totalClicks
+                console.log(item.clicks)
+            })
+
+            views = sum - lastCheck
+            clicks = totalClicks - lastClicks
+
+            header.innerText = views
+            clickTag.innerText = clicks
+
+
+            localStorage.setItem("sum", sum);
+            localStorage.setItem("clicks", totalClicks);
+            localStorage.setItem("lastDate", new Date().toLocaleString("en-US"));
+
+        }
+
+
+
+    </script>
+</body>
+
+</html>
